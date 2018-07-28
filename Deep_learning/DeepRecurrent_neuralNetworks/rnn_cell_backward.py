@@ -1,7 +1,9 @@
 # *_* coding:utf-8 *_*
 import numpy as np
+from Deep_learning.DeepRecurrent_neuralNetworks import rnn_cell_forward
+from Deep_learning import activation_function as ac
 
-def rnn_cell_forward(da_next,cache):
+def rnn_cell_backward(da_next,cache):
     """
     Implements the backward pass for the RNN-cell (single time-step).
 
@@ -30,17 +32,17 @@ def rnn_cell_forward(da_next,cache):
 
     ### START CODE HERE ###
     # compute the gradient of tanh with respect to a_next (≈1 line)
-    dtanh = np.tanh(a_next)**2
+    dtanh = da_next
     # compute the gradient of the loss with respect to Wax (≈2 lines)
-    dxt = np.dot(np.transpose(Wax),(1-np.tanh(np.dot(Wax,xt)+np.dot(Waa,a_prev)+ba)**2))
+    dxt = np.dot(np.transpose(Wax),1-np.tanh(np.dot(Wax,xt)+np.dot(Waa,a_prev)+ba)**2)
     dWax = np.dot((1-np.tanh(np.dot(Wax,xt)+np.dot(Waa,a_prev)+ba)**2),np.transpose(xt))
 
     # compute the gradient with respect to Waa (≈2 lines)
-    da_prev = np.dot(np.transpose(Waa),1-np.tanh(np.dot(Wax,)))
-    dWaa = None
+    da_prev = np.dot(np.transpose(Waa),1-np.tanh(np.dot(Wax,xt)+np.dot(Waa,a_prev)+ba)**2)
+    dWaa = np.dot((1-np.tanh(np.dot(Wax,xt)+np.dot(Waa,a_prev)+ba)**2),np.transpose(a_prev))
 
     # compute the gradient with respect to b (≈1 line)
-    dba = None
+    dba = np.sum(1-np.tanh(np.dot(Wax,xt)+np.dot(Waa,a_prev)+ba)**2,axis=1)
 
     ### END CODE HERE ###
 
@@ -48,3 +50,29 @@ def rnn_cell_forward(da_next,cache):
     gradients = {"dxt": dxt, "da_prev": da_prev, "dWax": dWax, "dWaa": dWaa, "dba": dba}
 
     return gradients
+
+if __name__ == "__main__":
+    np.random.seed(1)
+    xt = np.random.randn(3, 10)
+    a_prev = np.random.randn(5, 10)
+    Wax = np.random.randn(5, 3)
+    Waa = np.random.randn(5, 5)
+    Wya = np.random.randn(2, 5)
+    ba = np.random.randn(5, 1)
+    by = np.random.randn(2, 1)
+    parameters = {"Wax": Wax, "Waa": Waa, "Wya": Wya, "ba": ba, "by": by}
+
+    a_next, yt, cache = rnn_cell_forward.rnn_cell_forward(xt, a_prev, parameters)
+
+    da_next = np.random.randn(3, 10)
+    gradients = rnn_cell_backward(da_next, cache)
+    print("gradients[\"dxt\"][1][2] =", gradients["dxt"][1][2])
+    print("gradients[\"dxt\"].shape =", gradients["dxt"].shape)
+    print("gradients[\"da_prev\"][2][3] =", gradients["da_prev"][2][3])
+    print("gradients[\"da_prev\"].shape =", gradients["da_prev"].shape)
+    print("gradients[\"dWax\"][3][1] =", gradients["dWax"][3][1])
+    print("gradients[\"dWax\"].shape =", gradients["dWax"].shape)
+    print("gradients[\"dWaa\"][1][2] =", gradients["dWaa"][1][2])
+    print("gradients[\"dWaa\"].shape =", gradients["dWaa"].shape)
+    print("gradients[\"dba\"][4] =", gradients["dba"][4])
+    print("gradients[\"dba\"].shape =", gradients["dba"].shape)
