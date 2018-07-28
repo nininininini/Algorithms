@@ -1,7 +1,7 @@
 # *_* coding:utf-8 *_*
 
 import numpy as np
-from Deep_learning import activation_function as ac
+from Deep_learning.DeepRecurrent_neuralNetworks import activation_function as ac
 
 #GRADED FUNCTION: lstm_cell_forward
 

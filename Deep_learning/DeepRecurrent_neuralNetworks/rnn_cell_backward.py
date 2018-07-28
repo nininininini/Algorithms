@@ -1,7 +1,6 @@
 # *_* coding:utf-8 *_*
 import numpy as np
 from Deep_learning.DeepRecurrent_neuralNetworks import rnn_cell_forward
-from Deep_learning import activation_function as ac
 
 def rnn_cell_backward(da_next,cache):
     """
