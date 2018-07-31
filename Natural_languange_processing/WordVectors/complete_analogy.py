@@ -1,10 +1,12 @@
 # *_* coding *_*:
 import numpy as np
 from Natural_languange_processing.WordVectors import w2v_function as w2v
+from Natural_languange_processing.WordVectors import cosine_similarity  as cosine
+
 # GRADED FUNCTION complete_analogy
 
 words, word_to_vec_map = w2v.read_glove_vecs('data/glove.6B.50d.txt')
-def complete_analogy(word_a,word_b,word_c,word_to_ec_map):
+def complete_analogy(word_a,word_b,word_c,word_to_vec_map):
     """
     Performs the word analogy task as explained above: a is to b as c is to ____.
 
@@ -23,7 +25,7 @@ def complete_analogy(word_a,word_b,word_c,word_to_ec_map):
 
     ### START CODE HERE ###
     # Get the word embeddings v_a, v_b and v_c (≈1-3 lines)
-    e_a, e_b, e_c = None
+    e_a, e_b, e_c = word_to_vec_map[word_a],word_to_vec_map[word_b],word_to_vec_map[word_c]
     ### END CODE HERE ###
 
     words = word_to_vec_map.keys()
@@ -38,13 +40,19 @@ def complete_analogy(word_a,word_b,word_c,word_to_ec_map):
 
         ### START CODE HERE ###
         # Compute cosine similarity between the vector (e_b - e_a) and the vector ((w's vector representation) - e_c)  (≈1 line)
-        cosine_sim = None
+        cosine_sim = cosine.cosine_similarity(e_b-e_a,word_to_vec_map[w]-e_c)
 
         # If the cosine_sim is more than the max_cosine_sim seen so far,
         # then: set the new max_cosine_sim to the current cosine_sim and the best_word to the current word (≈3 lines)
-        if None > None:
-            max_cosine_sim = None
-            best_word = None
+        if cosine_sim > max_cosine_sim:
+            max_cosine_sim = cosine_sim
+            best_word = w
         ### END CODE HERE ###
 
     return best_word
+
+if __name__ == "__main__":
+    triads_to_try = [('italy', 'italian', 'spain'), ('india', 'delhi', 'japan'), ('man', 'woman', 'boy'),
+                     ('small', 'smaller', 'large')]
+    for triad in triads_to_try:
+        print('{} -> {} :: {} -> {}'.format(*triad, complete_analogy(*triad, word_to_vec_map)))
