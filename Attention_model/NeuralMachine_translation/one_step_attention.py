@@ -1,5 +1,7 @@
 # _*_ coding:utf-8 _*_
 
+from keras.layers import RepeatVector,Concatenate
+
 # GRADED FUNCTION: one_step_attention
 
 def one_step_attention(a,s_prev):
@@ -17,9 +19,9 @@ def one_step_attention(a,s_prev):
 
     ### START CODE HERE ###
     # Use repeator to repeat s_prev to be of shape (m,Tx,n_s) so that you can concatenate it with all hidden states "a"
-    s_prev = None
+    s_prev = RepeatVector(s_prev)
     # Use concatenator to concatenate a and s_prev on the last axis (≈ 1 line)
-    concat = None
+    concat = Concatenate(a)
     # Use densor1 to propagate concat through a small fully-connected neural network to compute the "intermediate energies" variable e. (≈1 lines)
     e = None
     # Use densor2 to propagate e through a small fully-connected neural network to compute the "energies" variable energies. (≈1 lines)
