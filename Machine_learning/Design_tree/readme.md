@@ -1,3 +1,5 @@
-# Decision trees  
-
-Decision Trees (DTs) are a non-parametric supervised learning method used for classification and regression. The goal is to create a model that predicts the value of a target variable by learning simple decision rules inferred from the data features.
+## 决策树算法
+    优点：计算复杂度不高，输出结果易于理解，对中间值的缺失不敏感，可以处理
+    不相关特征数据。
+    缺点：可能会产生过度匹配问题。
+    适用数据类型：数值型和标称型。
