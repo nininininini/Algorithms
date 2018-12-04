@@ -39,6 +39,7 @@ def bagOfWords2Vec(vocablist,inputSet):
             print("the word:%s is not in my Vocabulary" %word)
     return returnVec
 
+# 朴素贝叶斯 核心计算代码  计算概率
 def trainNB0(trainMatrix,trainCategory):
     numTrainDocs = len(trainMatrix)
     numWords = len(trainMatrix[0])
@@ -77,27 +78,68 @@ def testingNB():
     thisDoc = np.array(setOfWords2Vec(myVocabList,testEntry))
     print("testEntry, classified as :",classifyNB(thisDoc,p0V,p1V,pAb))
 
-if __name__ == "__main__":
-    postingList,classVec = loadDataSet()
-    # print(postingList)
+def textParse(bigString):
+    listofTokens = re.split(r'\W+',bigString)
+    return [tok.lower() for tok in listofTokens if len(tok) >2]
 
-    myVocabList = createVocabList(postingList)
-    print(myVocabList)
+def spamTest():
+    docList = []
+    classList = []
+    fullTest = []
+    for i in range(1,26):
+        wordList = textParse(open('data/email/spam/%d.txt'%i,encoding='ISO-8859-1').read())
+        docList.append(wordList)
+        fullTest.extend(wordList)
+        classList.append(1)
 
-    print(setOfWords2Vec(myVocabList,postingList[0]))
+        wordList = textParse(open('data/email/ham/%d.txt'%i,encoding='ISO-8859-1').read())
+        docList.append(wordList)
+        fullTest.extend(wordList)
+        classList.append(0)
 
+    vocabList = createVocabList(docList)
+    trainingSet = [i for i in range(50)]     # trainingSet index
+    testSet = []
+    for i in range(10):
+        randIndex = int(np.random.uniform(0,len(trainingSet)))   # 随机选取10条数据  用作测试集
+        testSet.append(trainingSet[randIndex])
+        del(trainingSet[randIndex])             # 训练集中删除测试集内的数据
     trainMat = []
-    for postinDoc in postingList:
-        trainMat.append(setOfWords2Vec(myVocabList,postinDoc))
+    trainClasses =[]
+    for docIndex in trainingSet:
+        trainMat.append(setOfWords2Vec(vocabList,docList[docIndex]))
+        trainClasses.append(classList[docIndex])
+    p0V,p1V,Pspam = trainNB0(np.array(trainMat),np.array(trainClasses))
+    errorCount = 0
+    for docIndex in testSet:
+        wordVector = setOfWords2Vec(vocabList,docList[docIndex])
+        if classifyNB(np.array(wordVector),p0V,p1V,Pspam) != classList[docIndex]:
+            errorCount += 1
+            # print(docList[docIndex])    误判断的邮件
+    print("the error rate is :", float(errorCount)/len(testSet))
 
-    p0V,p1V,pAb = trainNB0(trainMat,classVec)
-    print(p0V)
-    print(p1V)
+if __name__ == "__main__":
+    # postingList,classVec = loadDataSet()
+    # print(postingList)
+    # myVocabList = createVocabList(postingList)
+    # print(myVocabList)
+    #
+    # print(setOfWords2Vec(myVocabList,postingList[0]))
+    #
+    # trainMat = []
+    # for postinDoc in postingList:
+    #     trainMat.append(setOfWords2Vec(myVocabList,postinDoc))
+    #
+    # p0V,p1V,pAb = trainNB0(trainMat,classVec)
+    # print(p0V)
+    # print(p1V)
+    #
+    # testingNB()
+    #
+    # mysent = 'bayes is a famous scientist !'
+    # print(mysent.split())
+    #
+    # regEx = re.compile("\\W+")
+    # print(re.split(regEx,mysent))
 
-    testingNB()
-
-    mysent = 'bayes is a famous scientist !'
-    print(mysent.split())
-
-    regEx = re.compile("\\W*")
-    print(re.split(regEx,mysent))
+    spamTest()
