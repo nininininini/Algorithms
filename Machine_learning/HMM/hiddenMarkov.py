@@ -23,7 +23,7 @@ class HiddenMarkov:
                 B_t = B[i][indexofO]    # 该时刻该状态下 该观测结果的概率
 
                 if t == 0:  # 初始状态
-                    alpha[t][i] = PI[t][i] * B_t   # alpha 为到时刻t为止的前向概率
+                    alpha[t][i] = PI[0][i] * B_t   # alpha 为到时刻t为止的前向概率
 
                 else:
                     for j in range(N):
@@ -35,13 +35,23 @@ class HiddenMarkov:
     def backward(self,Q,V,A,B,O,PI):
         N = len(Q)
         M = len(O)
-        betas = np.ones((M,N))
+        betas = np.zeros((M,N))
+        betas[M-1] = 1.00
         T = M
         for t in range(M-2,-1,-1):
+            indexofO = V.index(O[t+1])  #找出序列对应的索引
+            for i in range(N):
+                for j in range(N):
+                    B_t = B[j][indexofO]
+                    betas[t][i] += betas[t+1][i]*A[i][j]*B_t
 
 
+        P = np.sum(PI[0][i]*B[i][V.index(O[0])]*betas[0][i] for i in range(N))
+        return P
 
 
 HMM = HiddenMarkov()
 p = HMM.forward(Q,V,A,B,O,PI)
+p2 = HMM.backward(Q,V,A,B,O,PI)
 print(p)
+print(p2)
