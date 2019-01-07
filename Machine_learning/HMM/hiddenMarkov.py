@@ -49,6 +49,19 @@ class HiddenMarkov:
         P = np.sum(PI[0][i]*B[i][V.index(O[0])]*betas[0][i] for i in range(N))
         return P
 
+    def viterbi(self,Q,V,A,B,O,PI):
+        N = len(Q)
+        M = len(O)
+        T = M
+        deltas = np.zeros((M,N))
+        psis = np.zeros((M,N))
+        for t in range(T):
+            indexofO = V.index(O[t])
+            if t == 0:
+                deltas[t] = np.dot(PI[t],B[:][indexofO])
+
+
+
 
 HMM = HiddenMarkov()
 p = HMM.forward(Q,V,A,B,O,PI)
