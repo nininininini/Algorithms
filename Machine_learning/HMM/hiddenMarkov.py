@@ -53,18 +53,31 @@ class HiddenMarkov:
         N = len(Q)
         M = len(O)
         T = M
+        B = np.array(B)
+        A = np.array(A)
         deltas = np.zeros((M,N))
         psis = np.zeros((M,N))
+        I = np.zeros((M,1),dtype=int)
         for t in range(T):
             indexofO = V.index(O[t])
             if t == 0:
-                deltas[t] = np.dot(PI[t],B[:][indexofO])
-
-
-
+                deltas[t] = np.multiply(PI[t],B[:,indexofO])
+                psis[t] = 0
+            else:
+                deltas[t] = np.max((deltas[t-1]*A.T).T*B[:,indexofO],axis=0)  # A.T 表示Aji的集合 Aji，从j状态到i状态
+                psis[t] = np.argmax(deltas[t-1]*A.T,axis=1)
+        P = max(deltas[T-1])
+        I[T-1] = np.argmax(deltas[T-1])
+        for t in range(M-2,-1,-1):
+            I[t] = psis[t+1][I[t+1]]
+        I = I+1
+        return I
 
 HMM = HiddenMarkov()
 p = HMM.forward(Q,V,A,B,O,PI)
 p2 = HMM.backward(Q,V,A,B,O,PI)
 print(p)
 print(p2)
+
+I = HMM.viterbi(Q,V,A,B,O,PI)
+print(I)
