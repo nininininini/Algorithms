@@ -1,0 +1,69 @@
+{
+    "dataset_reader": {
+        "type": "s2_papers"
+    },
+    "iterator": {
+        "type": "bucket",
+        "batch_size": 64,
+        "padding_noise": 0,
+        "sorting_keys": [
+            [
+                "abstract",
+                "num_tokens"
+            ],
+            [
+                "title",
+                "num_tokens"
+            ]
+        ]
+    },
+    "model": {
+        "type": "paper_classifier",
+        "abstract_encoder": {
+            "type": "boe",
+            "averaged": true,
+            "embedding_dim": 2
+        },
+        "classifier_feedforward": {
+            "activations": [
+                "sigmoid",
+                "linear"
+            ],
+            "dropout": [
+                0.2,
+                0
+            ],
+            "hidden_dims": [
+                2,
+                3
+            ],
+            "input_dim": 4,
+            "num_layers": 2
+        },
+        "text_field_embedder": {
+            "token_embedders": {
+                "tokens": {
+                    "type": "embedding",
+                    "embedding_dim": 2,
+                    "trainable": false
+                }
+            }
+        },
+        "title_encoder": {
+            "type": "boe",
+            "averaged": true,
+            "embedding_dim": 2
+        }
+    },
+    "train_data_path": "tests/s2_papers.jsonl",
+    "validation_data_path": "tests/s2_papers.jsonl",
+    "trainer": {
+        "cuda_device": -1,
+        "grad_clipping": 5,
+        "num_epochs": 1,
+        "optimizer": {
+            "type": "adagrad"
+        },
+        "validation_metric": "+accuracy"
+    }
+}

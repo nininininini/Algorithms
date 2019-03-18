@@ -7,3 +7,6 @@ babel
 matplotlib
 graphviz
 pandas
+torch
+allennlp
+tqdm
